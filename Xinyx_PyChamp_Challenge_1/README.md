@@ -31,7 +31,16 @@ You’ll be prompted to enter:
     - Digits
     - Special characters
 
-### Option 2: Call Programmatically (Example is wrapper.py)
+### Option 2: Execute GUI in Jupyter notebook
+- Open gui.ipynb using Jupyter Notebook
+- Click "Run All"
+- GUI should be at last cell
+
+#### GUI Snippet
+![alt text](1.png)
+![alt text](2.png)
+
+### Option 3: Call Programmatically (Example is wrapper.py)
 ```bash
 
 from main import password_generator
