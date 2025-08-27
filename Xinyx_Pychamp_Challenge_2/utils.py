@@ -2,7 +2,7 @@ from faker import Faker #generate random text
 import ipywidgets as widgets
 
 #Label widget creator
-def label_generator(name, width):
+def label_generator(name, width, height):
     return widgets.HTML(
         value=f"""
             <div style="
@@ -19,7 +19,7 @@ def label_generator(name, width):
         """,
         layout=widgets.Layout(
             width=f'{width}%',
-            height='100%'
+            height=f'{height}%'
         )
     )
 
