@@ -19,7 +19,8 @@ def label_generator(name, width, height):
         """,
         layout=widgets.Layout(
             width=f'{width}%',
-            height=f'{height}%'
+            height=f'{height}%',
+            #border='2px solid red'
         )
     )
 

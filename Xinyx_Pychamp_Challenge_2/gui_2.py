@@ -3,6 +3,7 @@ import ipywidgets as widgets
 from IPython.display import display, HTML, clear_output
 #time recorder logic
 import time
+import ipyevents
 from datetime import datetime
 #utils
 from utils import label_generator, random_text_generator
@@ -32,7 +33,7 @@ header=widgets.HBox(
     [gui_logo,gui_title],
     layout=widgets.Layout(
         width='100%',
-        height='37.5%'
+        height='10%'
     )
 )
 welcome_message = """
@@ -80,7 +81,7 @@ tester_name_widget = widgets.Text(
 )
 tester_name=widgets.HBox(
     [tester_name_label, tester_name_widget],
-    layout=widgets.Layout(width='100%',height='20%',display='flex',align_items='center',justify_content='flex-start',overflow='hidden')
+    layout=widgets.Layout(width='100%',height='3.5%',display='flex',align_items='center',justify_content='flex-start',overflow='hidden')
 )
 
 
@@ -99,7 +100,7 @@ difficulty_select_dropdown_widget = widgets.Dropdown(
 )
 difficulty_select_dropdown=widgets.HBox(
     [difficulty_select_dropdown_label, difficulty_select_dropdown_widget],
-    layout=widgets.Layout(width='100%',height='20%',display='flex',align_items='center',justify_content='flex-start',overflow='hidden')
+    layout=widgets.Layout(width='100%',height='3.5%',display='flex',align_items='center',justify_content='flex-start',overflow='hidden')
 )
 
 #Button to generate text
@@ -107,7 +108,9 @@ generate_button = widgets.Button(
     description="Generate Text",
     layout=widgets.Layout(
         width="35%",
-        height="15%",
+        height="3.5%",
+        margin="5px 0px"
+
     ))
 generate_button.add_class("custom-btn")
 display(HTML("""
@@ -122,21 +125,20 @@ display(HTML("""
 """))
 #Button clicked handler
 text_to_type_output = widgets.Output(layout=widgets.Layout(
-        border='3px double white',
+        border='3px double black',
         width="95%",
-        height="125%",
+        height="25%",
         overflow='hidden'
 ))
 
 #typing text area
-typing_text_area_label = label_generator('Type here: ', 100, 25)
+typing_text_area_label = label_generator('Type here: ', 75, 10)
 typing_text_area_widget = widgets.Textarea(
     disabled=True,
     placeholder='Start typing test',
     layout=widgets.Layout(
-        padding='10px',
-        margin='10px 0px',
-        width='100%',
+        padding='10px 0px',
+        width='95%',
         height='100%',
     )
 )
@@ -144,13 +146,14 @@ display(HTML("""
 <style>
 .no-resize textarea {
     resize: none !important;
+    font-size: 1rem;
 }
 </style>
 """))
 typing_text_area_widget.add_class("no-resize")
 typing_text_area=widgets.VBox(
     [typing_text_area_label, typing_text_area_widget],
-    layout=widgets.Layout(width='100%',height='150%',display='flex',align_items='center',justify_content='flex-start',overflow='hidden')
+    layout=widgets.Layout(width='100%',height='25%',display='flex',align_items='flex-start',justify_content='flex-start',overflow='hidden')
 )
 
 #Generate text to type
@@ -167,9 +170,9 @@ def generate_button_clicked(b):
         try:
             text_to_type = random_text_generator(level=difficulty_select_dropdown_widget.value)
             display(HTML(f"""
-                <div style='background-color: black; padding-inline: 2.5%; border: 2px double white; border-radius: 2.5%; height: 290px;'>
-                    <p style='color: whitesmoke; font-weight: bold; text-decration: underline;'>⌨️ Text to type: </p>
-                    <span style='font-weight: 700; color: white; font-size: 0.75rem;'>{text_to_type}</span>
+                <div style='background-color: #F1EE8E; padding-inline: 2.5%; border: 2px double white; height: 500px;'>
+                    <p style='color: black; font-weight: bold; text-decoration: underline; font-size: 1.25rem;'>⌨️ Text to type: </p>
+                    <span style='font-weight: 500; color: black; font-size: 1rem;'>{text_to_type}</span>
                 </div>
             """))
 
@@ -194,25 +197,8 @@ def start_timer_on_type(change):
 
 typing_text_area_widget.observe(start_timer_on_type, names="value")
 ##SUBMIT LOGICS
-submit_instruction=label_generator("Click submit once done typing.", 75, 100)
-#Button to submit entry
-submit_button = widgets.Button(
-    description="Submit",
-    layout=widgets.Layout(
-        width="35%",
-        height="15%",
-    ))
-submit_button.add_class("submit-btn")
-display(HTML("""
-<style>
-.submit-btn {
-    background-color: #005A32 !important;
-    border-radius: 12px !important;
-    font-weight: 800;
-    color: white !important;
-}
-</style>
-"""))
+submit_instruction=label_generator("Press Ctrl+Shift+Enter to submit once done.", 75, 5)
+
 #Result output
 submit_output = widgets.Output(layout=widgets.Layout(
         border='3px double white',
@@ -227,7 +213,19 @@ file_created_output = widgets.Output(layout=widgets.Layout(
         height="5%",
         overflow='hidden'
 ))
-# Submit handler
+# Submit outputs and handler
+submit_output = widgets.Output(layout=widgets.Layout(
+        border='3px double white',
+        width="95%",
+        height="15%",
+        overflow='hidden'
+))
+file_created_output = widgets.Output(layout=widgets.Layout(
+        border='3px double white',
+        width="95%",
+        height="5%",
+        overflow='hidden'
+))
 def on_submit(b=None):
     global end_time
     end_time = time.time()
@@ -261,11 +259,13 @@ def on_submit(b=None):
     with submit_output:
         submit_output.clear_output()
         display(HTML(f"""
-            <p>⏱ Time Taken: {time_taken:.2f}s</p>
-            <p>⌨️ WPM: {wpm:.2f}</p>
-            <p>🎯 Accuracy: {accuracy:.2f}%</p>
-            <p>❌ Wrong chars: {wrong_chars}</p>
-            <p>🕰️ Time created: {datetime.now()}</p>
+            <div style='background-color: #E69B00; padding-inline: 2.5%; border: 2px double white; border-radius: 2.5%; font-size: 1rem; color: whitesmoke; font-weight: 700;'>
+                <p>⏱ <u><b>Time Taken:</b></u> {time_taken:.2f}s</p>
+                <p>⌨️ <u><b>WPM:</b></u> {wpm:.2f}</p>
+                <p>🎯 <u><b>Accuracy:</b></u> {accuracy:.2f}%</p>
+                <p>❌ <u><b>Wrong chars:</b></u> {wrong_chars}</p>
+                <p>🕰️ <u><b>Time created:</b></u> {datetime.now()}</p>
+            </div>
         """))
 
     # Save results in a {tester_name}.txt
@@ -276,14 +276,27 @@ def on_submit(b=None):
             display(HTML(f"""
                 <div style='background-color: black; padding-inline: 2.5%; border: 2px double white; border-radius: 2.5%;'>
                     <p style='color: green; font-weight: bold;'>
-                        ✅ Result printed and generated at {tester_name_widget.value}.txt
+                        ✅ Result printed and generated at {tester_name_widget.value if tester_name_widget.value != "" else 'result'}.txt
                     </p>
                 </div>
-            """))
+            """))   
 
-submit_button.on_click(on_submit)
+#Event listeners
+submit_event = ipyevents.Event(
+    source=typing_text_area_widget,
+    watched_events=['keyup'],
+    prevent_default_action=False
+)
 
-###FIX space for results
+def handle_submit_event(event):
+    if (
+        event.get("key") == "Enter"
+        and event.get("ctrlKey", False)
+        and event.get("shiftKey", False)
+    ):
+        on_submit()
+
+submit_event.on_dom_event(handle_submit_event)
 
 #Compile in 1 layout widget whole GUI
 gui=widgets.VBox(
@@ -295,12 +308,11 @@ gui=widgets.VBox(
     text_to_type_output,
     typing_text_area,
     submit_instruction,
-    submit_button,
     submit_output,
     file_created_output],
     layout=widgets.Layout(
         width='650px',
-        height='2500px',
+        height='2250px',
         margin='10px',
     )
 )
