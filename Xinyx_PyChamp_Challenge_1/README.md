@@ -7,6 +7,8 @@ A customizable, secure password generator built in Python. Supports multiple con
 ## 📁 Project Structure
 <pre>
 ├── main.py # Core password generator function + validators
+├── gui.ipynb # GUI support for password generator function + validators
+├── gui.py # .py file for GUI support
 ├── user_input.py # CLI tool to generate passwords via user input 
 ├── wrapper.py # Script wrapper for static password generation
 ├── utils.py # Helper functions
