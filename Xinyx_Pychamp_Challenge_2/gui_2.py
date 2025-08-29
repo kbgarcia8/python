@@ -5,6 +5,7 @@ import time
 import ipyevents
 from datetime import datetime
 from utils import label_generator, random_text_generator
+from pathlib import Path
 
 # --- Header / Branding ---
 gui_logo_file = open("images/typing_test_2.png", "rb")
@@ -263,7 +264,12 @@ def on_submit(b=None):
         """))
 
     # Save to file
-    with open(f"{str(tester_name_widget.value).lower()}.txt", "a") as result_file:
+    tester_name = tester_name_widget.value.strip().lower() or "result"
+    results_dir = Path("results")
+    results_dir.mkdir(exist_ok=True)
+    file_path = results_dir / f"{tester_name}.txt"
+    
+    with file_path.open("a") as result_file:
         result_file.write(f"WPM: {wpm:.2f}, Accuracy: {accuracy:.2f}%, Time: {time_taken:.2f}s\n Total of wrong characters: {len(wrong_chars)}\n Wrong characters (index): {wrong_chars}\n Time Created: {datetime.now()}")
         with file_created_output:
             file_created_output.clear_output()
@@ -273,7 +279,8 @@ def on_submit(b=None):
                         ✅ Result printed and generated at {tester_name_widget.value if tester_name_widget.value != "" else 'result'}.txt
                     </p>
                 </div>
-            """))   
+            """))
+    result_file.close()
 
 # --- Keyboard Event Listener ---
 submit_event = ipyevents.Event(
