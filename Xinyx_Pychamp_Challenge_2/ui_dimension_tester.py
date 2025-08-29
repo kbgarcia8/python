@@ -111,10 +111,10 @@ generate_button = widgets.Button(
         height="3.5%",
         margin="5px 0px"
     ))
-generate_button.add_class("submit-btn")
+generate_button.add_class("custom-btn")
 display(HTML("""
 <style>
-.submit-btn {
+.custom-btn {
     background-color: #FFA630 !important;
     border-radius: 12px !important;
     font-weight: 800;
@@ -164,6 +164,8 @@ def generate_button_clicked(b):
     typing_text_area_widget.focus()
     typing_text_area_widget.disabled=False
     generate_button.disabled=True
+    retry_button.disabled=True
+    retry_button.display="none"
 
     with text_to_type_output:
         clear_output(wait=True)
@@ -213,94 +215,37 @@ file_created_output = widgets.Output(layout=widgets.Layout(
         overflow='hidden'
 ))
 
-# --- Submission Logic ---
-def on_submit(b=None):
-    retry_button.disabled=False
-    retry_button.layout.display="block"
-    global end_time
-    end_time = time.time()
-    user_text = typing_text_area_widget.value
+with submit_output:
+    submit_output.clear_output()
+    display(HTML(f"""
+        <div style='background-color: #E69B00; padding-inline: 2.5%; border: 2px double white; border-radius: 2.5%; font-size: 1rem; color: whitesmoke; font-weight: 700;'>
+            <p>⏱ <u><b>Time Taken:</b></u> {00.00}s</p>
+            <p>⌨️ <u><b>WPM:</b></u> {00.00}</p>
+            <p>🎯 <u><b>Accuracy:</b></u> {00.00}%</p>
+            <p>❌ <u><b>Wrong chars:</b></u> {0000}</p>
+            <p>🕰️ <u><b>Time created:</b></u> {'2025-08-29 20:53:17'}</p>
+        </div>
+    """))
 
-    if not user_text.strip():
-        display(HTML("<p style='color:red;'>❌ No text entered!</p>"))
-        return
-    
-    # WPM
-    time_taken = end_time - start_time
-    words = len(user_text.split())
-    wpm = (words / time_taken) * 60
-
-    # --- Accuracy Calculation ---
-    """
-    We calculate accuracy by comparing user_text vs text_to_type char-by-char:
-    - zip(user_text, text_to_type) pairs up characters from both strings
-    - enumerate(...) gives (index, (char_from_user, char_from_text))
-    - correct = sum(1 for a, b in zip(...) if a == b)
-    - accuracy = correct / max(len(user_text), len(text_to_type)) * 100
-    """
-    total_char = max(len(user_text), len(text_to_type))
-    correct = sum(1 for a, b in zip(user_text, text_to_type) if a == b)
-    accuracy = (correct / total_char) * 100
-
-    # --- Wrong Characters ---
-    """
-    We capture wrong chars as (index, typed_char, correct_char).
-    enumerate(zip(...)) lets us track position along with both chars.
-    """
-    wrong_chars = [(i, a, b) for i, (a, b) in enumerate(zip(user_text, text_to_type)) if a != b]
-    
-    # Display results
-    with submit_output:
-        submit_output.clear_output()
-        display(HTML(f"""
-            <div style='background-color: #E69B00; padding-inline: 2.5%; border: 2px double white; border-radius: 2.5%; font-size: 1rem; color: whitesmoke; font-weight: 700;'>
-                <p>⏱ <u><b>Time Taken:</b></u> {time_taken:.2f}s</p>
-                <p>⌨️ <u><b>WPM:</b></u> {wpm:.2f}</p>
-                <p>🎯 <u><b>Accuracy:</b></u> {accuracy:.2f}%</p>
-                <p>❌ <u><b>Wrong chars:</b></u> {len(wrong_chars)}</p>
-                <p>🕰️ <u><b>Time created:</b></u> {datetime.now()}</p>
-            </div>
-        """))
-
-    # Save to file
-    with open(f"{str(tester_name_widget.value).lower()}.txt", "a") as result_file:
-        result_file.write(f"WPM: {wpm:.2f}, Accuracy: {accuracy:.2f}%, Time: {time_taken:.2f}s\n Total of wrong characters: {len(wrong_chars)}\n Wrong characters (index): {wrong_chars}\n Time Created: {datetime.now()}")
-        with file_created_output:
-            file_created_output.clear_output()
-            display(HTML(f"""
-                <div style='background-color: black; padding-inline: 2.5%; border: 2px double white; border-radius: 2.5%;'>
-                    <p style='color: green; font-weight: bold;'>
-                        ✅ Result printed and generated at {tester_name_widget.value if tester_name_widget.value != "" else 'result'}.txt
-                    </p>
-                </div>
-            """))   
-
-# --- Keyboard Event Listener ---
-submit_event = ipyevents.Event(
-    source=typing_text_area_widget,
-    watched_events=['keyup'],
-    prevent_default_action=False
-)
-
-def handle_submit_event(event):
-    if (
-        event.get("key") == "Enter"
-        and event.get("ctrlKey", False)
-        and event.get("shiftKey", False)
-    ):
-        on_submit()
-
-submit_event.on_dom_event(handle_submit_event)
+with file_created_output:
+    file_created_output.clear_output()
+    display(HTML(f"""
+        <div style='background-color: black; padding-inline: 2.5%; border: 2px double white; border-radius: 2.5%;'>
+            <p style='color: green; font-weight: bold;'>
+                ✅ Result printed and generated at result.txt
+            </p>
+        </div>
+    """))
 
 # --- Retry Button ---
 retry_button = widgets.Button(
     description="Retry Typing",
-    disabled=True,
+    disabled=False,
+    display='block',
     layout=widgets.Layout(
         width="35%",
         height="3.5%",
-        margin="5px 0px",
-        display="none"
+        margin="5px 0px"
     ))
 retry_button.add_class("retry-btn")
 display(HTML("""
@@ -315,6 +260,7 @@ display(HTML("""
 """))
 
 retry_button.on_click(generate_button_clicked)
+
 
 # --- GUI Assembly ---
 gui=widgets.VBox(
