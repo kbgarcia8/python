@@ -1,0 +1,35 @@
+display(HTML("""
+<style>
+.no-resize textarea {
+    resize: none !important;
+    font-size: 1rem;
+}
+</style>
+"""))
+typing_text_area_widget.add_class("no-resize")
+
+display(HTML("""
+<style>
+.submit-btn {
+    background-color: #FFA630 !important;
+    border-radius: 12px !important;
+    font-weight: 800;
+    color: white !important;
+}
+</style>
+"""))
+generate_button.add_class("submit-btn")
+
+display(HTML("""
+<style>
+.retry-btn {
+    background-color: #DF705F !important;
+    border-radius: 12px !important;
+    font-weight: 800;
+    color: whitesmoke !important;
+}
+</style>
+"""))
+retry_button.add_class("retry-btn")
+
+from IPython.display import HTML
